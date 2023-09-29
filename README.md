@@ -16,7 +16,7 @@ The project is organized into several components:
 To get started with CatDogNet, you'll need to install Python and the necessary libraries. You can install them with pip:
 
 ```bash
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 Then, you can clone this repository to your local machine:
