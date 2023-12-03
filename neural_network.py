@@ -30,6 +30,10 @@ class NeuralNetwork:
             # Convert X to a NumPy array if it's a list
             X = np.array(X) if isinstance(X, list) else X
 
+            # Ensure X has the correct shape (number of features)
+            if X.ndim == 1:
+                X = X.reshape(1, -1)
+
             # Rest of your code remains the same
             self.Z1 = X.dot(self.W1) + self.b1
             self.A1 = self.relu(self.Z1)
