@@ -12,22 +12,20 @@ def load_data(data_path):
     test_path = os.path.join(data_path, 'test')
 
     # Load training data
-    for category in os.listdir(train_path):
-        category_path = os.path.join(train_path, category)
+    for file_name in os.listdir(train_path):
+        file_path = os.path.join(train_path, file_name)
 
-        # Skip non-directory entries
-        if not os.path.isdir(category_path):
+        # Skip non-image files
+        if not file_path.endswith(('.jpg', '.png', '.jpeg')):
             continue
 
-        label = 1 if category == 'cat' else 0  # 1 for cat, 0 for dog
+        label = 1 if 'cat' in file_name else 0  # 1 for cat, 0 for dog
 
         # Load and preprocess training images
-        images = [os.path.join(category_path, file_name) for file_name in os.listdir(category_path)]
-        labels = [label] * len(images)
-        train_data.extend(images)
-        train_labels.extend(labels)
+        train_data.append(file_path)
+        train_labels.append(label)
 
-    # Load and preprocess test images
-    test_data = [os.path.join(test_path, file_name) for file_name in os.listdir(test_path)]
+        # Load and preprocess test images
+        test_data = [os.path.join(test_path, file_name) for file_name in os.listdir(test_path) if file_name.endswith(('.jpg', '.png', '.jpeg'))]
 
-    return train_data, train_labels, test_data, test_labels
+        return train_data, train_labels, test_data, test_labels
