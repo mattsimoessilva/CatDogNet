@@ -1,14 +1,30 @@
-def dot_product(A, B):
-    """Calculate the dot product of two matrices."""
-    if len(A[0]) != len(B):
+def dot_product(matrix_A, matrix_B):
+    """
+    Computes the dot product of two matrices.
+    Assumes the matrices are valid for multiplication.
+
+    Parameters:
+        matrix_A (list): First matrix.
+        matrix_B (list): Second matrix.
+
+    Returns:
+        list: Resulting matrix.
+    """
+    num_rows_A, num_cols_A = len(matrix_A), len(matrix_A[0])
+    num_rows_B, num_cols_B = len(matrix_B), len(matrix_B[0])
+
+    # Check if the matrices are valid for multiplication
+    if num_cols_A != num_rows_B:
         raise ValueError("The number of columns in the first matrix must be equal to the number of rows in the second matrix.")
-    
-    C = [[0] * len(B[0]) for _ in range(len(A))]
-    for i, row_A in enumerate(A):
-        for j in range(len(B[0])):
-            for k, element_B in enumerate(B):
-                C[i][j] += row_A[k] * element_B[j]
-    return C
+
+    result = [[0.0] * num_cols_B for _ in range(num_rows_A)]
+
+    for i in range(num_rows_A):
+        for j in range(num_cols_B):
+            for k in range(num_cols_A):
+                result[i][j] += matrix_A[i][k] * matrix_B[k][j]
+
+    return result
 
 def matrix_addition(A, B):
     """Add two matrices element-wise."""
