@@ -1,27 +1,33 @@
-from neural_network import NeuralNetwork  # Supondo que o código da rede neural está em um arquivo chamado neural_network.py
-from data_loader import load_data  # Supondo que você tenha uma função de carregamento de dados em um arquivo chamado data_loader.py
+# use_model.py
 
-def main():
-    # Carregar dados
-    data_path = 'path/to/your/dataset'  # Substitua pelo caminho real
-    X_train, Y_train, X_test = load_data(data_path)  # Carregue seus dados de treinamento e teste
+from neural_network import NeuralNetwork
+from image_processing import load_and_preprocess_image
+import pickle
 
-    # Criar uma instância da rede neural
-    n_x = len(X_train[0])
-    n_h = 64  # Número de neurônios na camada oculta
-    n_y = len(set(Y_train))  # Número de classes (assumindo classificação)
+# Load the saved parameters
+with open('model_params.pkl', 'rb') as f:
+    params = pickle.load(f)
 
-    neural_net = NeuralNetwork(n_x, n_h, n_y, alpha=0.01, batch_size=32, epochs=100, lambd=0.7)
+# Create an instance of the neural network
+neural_net = NeuralNetwork(len(params['W1']), len(params['W1'][0]), len(params['W2']), alpha=0.01, batch_size=32, epochs=100, lambd=0.7)
 
-    # Treinar a rede neural
-    neural_net.train(X_train, Y_train)
+# Assign the parameters to the neural network
+neural_net.W1 = params['W1']
+neural_net.b1 = params['b1']
+neural_net.W2 = params['W2']
+neural_net.b2 = params['b2']
 
-    # Fazer previsões usando a rede neural treinada
-    predictions = neural_net.predict(X_test)
+# Load and preprocess the image from the given path
+image_path = 'data/image.png'
+X_new = load_and_preprocess_image(image_path)
 
-    # Imprimir as previsões
+# Check if the image was loaded successfully
+if X_new is not None:
+    # Make predictions on the new image
+    predictions = neural_net.predict([X_new])
+
+    # Print the predictions
     print("Predictions:", predictions)
-
-if __name__ == "__main__":
-    main()
+else:
+    print("Error loading or processing the image.")
 
