@@ -1,26 +1,13 @@
-from image_processing import load_and_preprocess_images, create_labels, split_data
 import os
 import cv2
+import numpy as np
 
 def check_and_resize_image(image_path, target_dimensions):
     image = cv2.imread(image_path)
     resized_image = cv2.resize(image, target_dimensions, interpolation=cv2.INTER_AREA)
     return resized_image
 
-def check_image_dimensions(image_paths, target_dimensions=(224, 224)):
-    # Check dimensions of the first image
-    first_image = cv2.imread(image_paths[0])
-    first_dimensions = first_image.shape
-
-    # Check dimensions of other images
-    for path in image_paths[1:]:
-        image = cv2.imread(path)
-        if image.shape != first_dimensions:
-            print(f"Resizing image: {path}")
-            resized_image = check_and_resize_image(path, target_dimensions)
-            cv2.imwrite(path, resized_image)
-
-def load_data(data_path):
+def load_data(data_path, use_percent=0.5):
     train_data = []
     train_labels = []
     test_data = []
@@ -42,9 +29,16 @@ def load_data(data_path):
 
         # Load and preprocess training images
         image = cv2.imread(file_path)
-        image = image.reshape(-1) # Flatten the image
+        image = image.reshape(-1)  # Flatten the image
         train_data.append(image)
         train_labels.append(label)
+
+    # Determine the number of samples to use based on the percentage
+    num_samples_to_use = int(len(train_data) * use_percent)
+
+    # Use only a subset of the training data
+    train_data = train_data[:num_samples_to_use]
+    train_labels = train_labels[:num_samples_to_use]
 
     # Load and preprocess test images
     for file_name in os.listdir(test_path):
@@ -56,7 +50,7 @@ def load_data(data_path):
 
         # Load and preprocess test images
         image = cv2.imread(file_path)
-        image = image.reshape(-1) # Flatten the image
+        image = image.reshape(-1)  # Flatten the image
         test_data.append(image)
 
     return train_data, train_labels, test_data, test_labels

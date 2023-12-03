@@ -4,7 +4,7 @@ import pickle
 
 # Load training data
 data_path = '/content/CatDogNet'  # Update with the actual path
-X_train, Y_train, X_test, Y_test = load_data(data_path)
+X_train, Y_train, X_test, Y_test = load_data(data_path, use_percent=0.5)
 
 # Create and train the neural network
 n_x = len(X_train[0])
