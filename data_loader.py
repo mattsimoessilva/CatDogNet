@@ -1,5 +1,24 @@
 from image_processing import load_and_preprocess_images, create_labels, split_data
 import os
+import cv2
+
+def check_and_resize_image(image_path, target_dimensions):
+    image = cv2.imread(image_path)
+    resized_image = cv2.resize(image, target_dimensions, interpolation=cv2.INTER_AREA)
+    return resized_image
+
+def check_image_dimensions(image_paths, target_dimensions=(224, 224)):
+    # Check dimensions of the first image
+    first_image = cv2.imread(image_paths[0])
+    first_dimensions = first_image.shape
+
+    # Check dimensions of other images
+    for path in image_paths[1:]:
+        image = cv2.imread(path)
+        if image.shape != first_dimensions:
+            print(f"Resizing image: {path}")
+            resized_image = check_and_resize_image(path, target_dimensions)
+            cv2.imwrite(path, resized_image)
 
 def load_data(data_path):
     train_data = []
@@ -25,7 +44,7 @@ def load_data(data_path):
         train_data.append(file_path)
         train_labels.append(label)
 
-        # Load and preprocess test images
-        test_data = [os.path.join(test_path, file_name) for file_name in os.listdir(test_path) if file_name.endswith(('.jpg', '.png', '.jpeg'))]
+    # Load and preprocess test images
+    test_data = [os.path.join(test_path, file_name) for file_name in os.listdir(test_path) if file_name.endswith(('.jpg', '.png', '.jpeg'))]
 
     return train_data, train_labels, test_data, test_labels
