@@ -27,12 +27,15 @@ class NeuralNetwork:
         return expZ / np.sum(expZ, axis=1, keepdims=True)
 
     def forward_propagation(self, X):
-        # Compute the output
-        self.Z1 = X.dot(self.W1) + self.b1
-        self.A1 = self.relu(self.Z1)
-        self.Z2 = self.A1.dot(self.W2) + self.b2
-        self.A2 = self.softmax(self.Z2)
-        return self.A2
+            # Convert X to a NumPy array if it's a list
+            X = np.array(X) if isinstance(X, list) else X
+
+            # Rest of your code remains the same
+            self.Z1 = X.dot(self.W1) + self.b1
+            self.A1 = self.relu(self.Z1)
+            self.Z2 = self.A1.dot(self.W2) + self.b2
+            self.A2 = self.softmax(self.Z2)
+            return self.A2
 
     def compute_cost(self, A, Y):
         # Cross-entropy cost function with L2 regularization
