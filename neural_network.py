@@ -62,8 +62,9 @@ class NeuralNetwork:
         # Training loop with mini-batch gradient descent
         m = len(X)
         permutation = np.random.permutation(m)
-        shuffled_X = X[permutation]
-        shuffled_Y = Y[permutation]
+        shuffled_X = [X[i] for i in permutation]
+        shuffled_Y = [Y[i] for i in permutation]
+
 
         for epoch in range(self.epochs):
             epoch_cost = 0
