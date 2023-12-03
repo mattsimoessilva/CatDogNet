@@ -3,7 +3,7 @@ from data_loader import load_data
 import pickle
 
 # Load training data
-data_path = 'dataset'  # Update with the actual path
+data_path = '/'  # Update with the actual path
 X_train, Y_train, X_test, Y_test = load_data(data_path)
 
 # Create and train the neural network
