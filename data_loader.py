@@ -41,10 +41,22 @@ def load_data(data_path):
         label = 1 if 'cat' in file_name else 0  # 1 for cat, 0 for dog
 
         # Load and preprocess training images
-        train_data.append(file_path)
+        image = cv2.imread(file_path)
+        image = image.reshape(-1) # Flatten the image
+        train_data.append(image)
         train_labels.append(label)
 
     # Load and preprocess test images
-    test_data = [os.path.join(test_path, file_name) for file_name in os.listdir(test_path) if file_name.endswith(('.jpg', '.png', '.jpeg'))]
+    for file_name in os.listdir(test_path):
+        file_path = os.path.join(test_path, file_name)
+
+        # Skip non-image files
+        if not file_path.endswith(('.jpg', '.png', '.jpeg')):
+            continue
+
+        # Load and preprocess test images
+        image = cv2.imread(file_path)
+        image = image.reshape(-1) # Flatten the image
+        test_data.append(image)
 
     return train_data, train_labels, test_data, test_labels
