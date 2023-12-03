@@ -65,14 +65,13 @@ class NeuralNetwork:
         shuffled_X = [X[i] for i in permutation]
         shuffled_Y = [Y[i] for i in permutation]
 
-
         for epoch in range(self.epochs):
             epoch_cost = 0
-            num_batches = m // self.batch_size
+            num_batches = int(m / self.batch_size)
             for i in range(num_batches):
                 start = i * self.batch_size
                 end = start + self.batch_size
-                X_batch = shuffled_X[start:end]
+                X_batch = np.array(shuffled_X[start:end])
                 Y_batch = shuffled_Y[start:end]
 
                 A2 = self.forward_propagation(X_batch)
