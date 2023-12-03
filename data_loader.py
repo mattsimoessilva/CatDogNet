@@ -7,9 +7,6 @@ def check_and_resize_image(image_path, target_dimensions):
     resized_image = cv2.resize(image, target_dimensions, interpolation=cv2.INTER_AREA)
     return resized_image
 
-def flatten_image(image):
-    return image.reshape(-1)  # Flatten the image
-
 def load_data(data_path, use_percent=0.5):
     train_data = []
     train_labels = []
@@ -32,8 +29,8 @@ def load_data(data_path, use_percent=0.5):
 
         # Load and preprocess training images
         image = cv2.imread(file_path)
-        flat_image = flatten_image(image)
-        train_data.append(flat_image)
+        image = image.reshape(-1)  # Flatten the image
+        train_data.append(image)
         train_labels.append(label)
 
     # Determine the number of samples to use based on the percentage
@@ -53,7 +50,7 @@ def load_data(data_path, use_percent=0.5):
 
         # Load and preprocess test images
         image = cv2.imread(file_path)
-        flat_image = flatten_image(image)
-        test_data.append(flat_image)
+        image = image.reshape(-1)  # Flatten the image
+        test_data.append(image)
 
     return train_data, train_labels, test_data, test_labels
