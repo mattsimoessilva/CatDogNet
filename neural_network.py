@@ -71,8 +71,8 @@ class NeuralNetwork:
             for i in range(num_batches):
                 start = i * self.batch_size
                 end = start + self.batch_size
-                X_batch = np.array(shuffled_X[start:end])
-                Y_batch = shuffled_Y[start:end]
+                X_batch = np.array(shuffled_X[start:end])  # Convert to NumPy array
+                Y_batch = np.array(shuffled_Y[start:end])  # Convert to NumPy array
 
                 A2 = self.forward_propagation(X_batch)
                 batch_cost = self.compute_cost(A2, Y_batch)
@@ -82,7 +82,7 @@ class NeuralNetwork:
 
             if epoch % 100 == 0:
                 print(f"Cost after epoch {epoch}: {epoch_cost / num_batches}")
-
+                
     def predict(self, X):
         # Predict the label of an unseen image
         A2 = self.forward_propagation(X)
