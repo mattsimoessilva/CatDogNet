@@ -1,13 +1,8 @@
+from image_processing import load_and_preprocess_images, create_labels, split_data
 import os
 import cv2
-import numpy as np
 
-def check_and_resize_image(image_path, target_dimensions):
-    image = cv2.imread(image_path)
-    resized_image = cv2.resize(image, target_dimensions, interpolation=cv2.INTER_AREA)
-    return resized_image
-
-def load_data(data_path, use_percent=0.5):
+def load_data(data_path):
     train_data = []
     train_labels = []
     test_data = []
@@ -17,31 +12,38 @@ def load_data(data_path, use_percent=0.5):
     train_path = os.path.join(data_path, 'train')
     test_path = os.path.join(data_path, 'test')
 
+    cat_images = []
+    dog_images = []
+
     # Load training data
-    for file_name in os.listdir(train_path):
+    for file_name in sorted(os.listdir(train_path)):
         file_path = os.path.join(train_path, file_name)
 
         # Skip non-image files
         if not file_path.endswith(('.jpg', '.png', '.jpeg')):
             continue
 
-        label = 1 if 'cat' in file_name else 0  # 1 for cat, 0 for dog
-
         # Load and preprocess training images
         image = cv2.imread(file_path)
-        image = image.reshape(-1)  # Flatten the image
-        train_data.append(image)
-        train_labels.append(label)
+        image = image.reshape(-1) # Flatten the image
 
-    # Determine the number of samples to use based on the percentage
-    num_samples_to_use = int(len(train_data) * use_percent)
+        if 'cat' in file_name:
+            cat_images.append((image, 1))  # 1 for cat
+        elif 'dog' in file_name:
+            dog_images.append((image, 0))  # 0 for dog
 
-    # Use only a subset of the training data
-    train_data = train_data[:num_samples_to_use]
-    train_labels = train_labels[:num_samples_to_use]
+    # Load only half of the cats and dogs
+    half_cat = len(cat_images) // 2
+    half_dog = len(dog_images) // 2
+
+    train_data += [img for img, label in cat_images[:half_cat]]
+    train_labels += [label for img, label in cat_images[:half_cat]]
+
+    train_data += [img for img, label in dog_images[:half_dog]]
+    train_labels += [label for img, label in dog_images[:half_dog]]
 
     # Load and preprocess test images
-    for file_name in os.listdir(test_path):
+    for file_name in sorted(os.listdir(test_path)):
         file_path = os.path.join(test_path, file_name)
 
         # Skip non-image files
@@ -50,7 +52,7 @@ def load_data(data_path, use_percent=0.5):
 
         # Load and preprocess test images
         image = cv2.imread(file_path)
-        image = image.reshape(-1)  # Flatten the image
+        image = image.reshape(-1) # Flatten the image
         test_data.append(image)
 
     return train_data, train_labels, test_data, test_labels
