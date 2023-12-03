@@ -5,9 +5,9 @@ import random
 class NeuralNetwork:
     def __init__(self, n_x, n_h, n_y, alpha=0.01, batch_size=32, epochs=100, lambd=0.7):
         # Initialize weights (W), biases (b) and hyperparameters
-        self.W1 = [[random.random() for _ in range(n_h)] for _ in range(n_x)]
+        self.W1 = [[random.uniform(-1, 1) for _ in range(n_h)] for _ in range(n_x)]  # Use a better weight initialization
         self.b1 = [[0] for _ in range(n_h)]
-        self.W2 = [[random.random() for _ in range(n_y)] for _ in range(n_h)]
+        self.W2 = [[random.uniform(-1, 1) for _ in range(n_y)] for _ in range(n_h)]
         self.b2 = [[0] for _ in range(n_y)]
         self.alpha = alpha
         self.batch_size = batch_size
@@ -24,8 +24,9 @@ class NeuralNetwork:
 
     def softmax(self, Z):
         # Softmax activation function
+        epsilon = 1e-8  # Small constant to avoid division by zero
         expZ = [[math.exp(z) for z in row] for row in Z]
-        sum_expZ = sum([sum(row) for row in expZ])
+        sum_expZ = sum([sum(row) for row in expZ]) + epsilon
         return [[z / sum_expZ for z in row] for row in expZ]
 
     def forward_propagation(self, X):
@@ -39,7 +40,8 @@ class NeuralNetwork:
     def compute_cost(self, A, Y):
         # Cross-entropy cost function with L2 regularization
         m = len(Y[0])
-        cost = -sum([sum([y * math.log(a) for a, y in zip(row_A, row_Y)]) for row_A, row_Y in zip(A, Y)]) / m
+        epsilon = 1e-8  # Small constant to avoid division by zero
+        cost = -sum([sum([y * math.log(max(a, epsilon)) for a, y in zip(row_A, row_Y)]) for row_A, row_Y in zip(A, Y)]) / m
         L2_regularization_cost = (sum([sum([w**2 for w in row]) for row in self.W1]) + sum([sum([w**2 for w in row]) for row in self.W2])) * self.lambd / (2 * m)
         return cost + L2_regularization_cost
 
@@ -89,3 +91,4 @@ class NeuralNetwork:
         # Predict the label of an unseen image
         A2 = self.forward_propagation(X)
         return [row.index(max(row)) for row in A2]
+

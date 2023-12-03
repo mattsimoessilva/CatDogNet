@@ -1,38 +1,30 @@
 from PIL import Image
+import os
 
-def load_image(file_path):
-    """
-    Function to load an image from a file.
-    """
-    return Image.open(file_path)
+def load_and_preprocess_image(file_path, target_size=(128, 128)):
+    """Load and preprocess an image using PIL."""
+    try:
+        image = Image.open(file_path)
+        image = image.resize(target_size)
+        # Normalize pixel values without NumPy
+        image_data = [pixel / 255.0 for pixel in image.getdata()]
+        return image_data
+    except IOError:
+        print(f"Error opening or processing image at path: {file_path}")
+        return None
 
-def resize_image(image, size):
-    """
-    Function to resize an image to a desired size.
-    """
-    return image.resize(size)
-
-def normalize_image(image):
-    """
-    Function to normalize the pixel values of an image.
-    """
-    return [pixel / 255.0 for pixel in image.getdata()]
+def load_and_preprocess_images(image_paths, labels):
+    """Load and preprocess a list of images with their corresponding labels."""
+    images = [load_and_preprocess_image(path) for path in image_paths]
+    images = [img for img in images if img is not None]  # Remove None values
+    labels = [label for img, label in zip(images, labels) if img is not None]  # Corresponding labels
+    return images, labels
 
 def create_labels(image_paths):
-    """
-    Function to create labels for images based on their file names.
-    """
-    labels = []
-    for path in image_paths:
-        if 'cat' in path:
-            labels.append([1, 0])  # [1, 0] for cat
-        elif 'dog' in path:
-            labels.append([0, 1])  # [0, 1] for dog
-    return labels
+    """Create labels for images based on their file names."""
+    return [1 if 'cat' in os.path.basename(path) else 0 for path in image_paths]
 
 def split_data(images, labels, train_ratio=0.8):
-    """
-    Function to split data into training and testing sets.
-    """
+    """Split data into training and testing sets."""
     num_train = int(len(images) * train_ratio)
     return images[:num_train], labels[:num_train], images[num_train:], labels[num_train:]
