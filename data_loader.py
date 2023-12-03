@@ -28,4 +28,4 @@ def load_data(data_path):
         # Load and preprocess test images
         test_data = [os.path.join(test_path, file_name) for file_name in os.listdir(test_path) if file_name.endswith(('.jpg', '.png', '.jpeg'))]
 
-        return train_data, train_labels, test_data, test_labels
+    return train_data, train_labels, test_data, test_labels
