@@ -27,19 +27,24 @@ class NeuralNetwork:
         return expZ / np.sum(expZ, axis=1, keepdims=True)
 
     def forward_propagation(self, X):
-            # Convert X to a NumPy array if it's a list
-            X = np.array(X) if isinstance(X, list) else X
+        # Convert X to a NumPy array if it's a list
+        X = np.array(X) if isinstance(X, list) else X
 
-            # Ensure X has the correct shape (number of features)
-            if X.ndim == 1:
-                X = X.reshape(1, -1)
+        # Ensure X has the correct shape (number of features)
+        if X.ndim == 1:
+            X = X.reshape(1, -1)
 
-            # Rest of your code remains the same
-            self.Z1 = X.dot(self.W1) + self.b1
-            self.A1 = self.relu(self.Z1)
-            self.Z2 = self.A1.dot(self.W2) + self.b2
-            self.A2 = self.softmax(self.Z2)
-            return self.A2
+        # Forward propagation
+        self.Z1 = X.dot(self.W1) + self.b1
+        self.A1 = self.relu(self.Z1)
+        self.Z2 = self.A1.dot(self.W2) + self.b2
+        self.A2 = self.softmax(self.Z2)
+
+        # Store intermediate values needed for backpropagation in cache
+        cache = (self.W1, self.b1, self.W1, self.b1, self.A1, self.Z1)
+
+        return self.A2, cache
+
 
     def compute_cost(self, A, Y):
         # Cross-entropy cost function with L2 regularization
@@ -49,14 +54,17 @@ class NeuralNetwork:
         L2_regularization_cost = (np.sum(self.W1**2) + np.sum(self.W2**2)) * self.lambd / (2 * m)
         return cost + L2_regularization_cost
 
-    def backward_propagation(self, X, Y):
+    def backward_propagation(self, X, Y, cache):
+        # Unpack cache
+        W1, b1, W2, b2, A1, Z1 = cache
+
         # Compute the error and adjust weights & biases
         m = len(X)
         dZ2 = self.A2 - Y
-        dW2 = (self.A1.T.dot(dZ2) + self.lambd * self.W2) / m
+        dW2 = (A1.T.dot(dZ2) + self.lambd * W2) / m
         db2 = np.sum(dZ2, axis=0, keepdims=True) / m
-        dZ1 = dZ2.dot(self.W2.T) * self.relu_derivative(self.Z1)
-        dW1 = (X.T.dot(dZ1) + self.lambd * self.W1) / m
+        dZ1 = dZ2.dot(W2.T) * self.relu_derivative(Z1)
+        dW1 = (X.T.dot(dZ1) + self.lambd * W1) / m
         db1 = np.sum(dZ1, axis=0, keepdims=True) / m
 
         # Update the weights and biases
