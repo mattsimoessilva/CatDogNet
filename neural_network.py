@@ -3,7 +3,7 @@ import numpy as np
 class NeuralNetwork:
     def __init__(self, n_x, n_h, n_y, alpha=0.01, batch_size=32, epochs=100, lambd=0.7):
         # Initialize weights (W), biases (b) and hyperparameters
-        self.W1 = np.random.uniform(-1, 1, size=(n_x, n_h))
+        self.W1 = np.random.uniform(-1, 1, size=(n_x * n_x * 3, n_h))
         self.b1 = np.zeros((1, n_h))
         self.W2 = np.random.uniform(-1, 1, size=(n_h, n_y))
         self.b2 = np.zeros((1, n_y))

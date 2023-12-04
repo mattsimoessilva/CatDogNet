@@ -15,6 +15,8 @@ def image_generator(files, batch_size=32):
             output = [1, 0] if 'cat' in input_path else [0, 1]
 
             input = cv2.resize(input, (64, 64))
+            input = input.flatten()
+
 
             batch_input.append(input)
             batch_output.append(output)
