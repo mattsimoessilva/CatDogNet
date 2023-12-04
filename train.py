@@ -8,7 +8,7 @@ from keras.callbacks import Callback
 
 class MyCallback(Callback):
     def on_epoch_end(self, epoch, logs=None):
-        if(logs.get('accuracy') > 0.9):
+        if(logs.get('val_accuracy') > 0.9):
             print("\nReached 90% accuracy so cancelling training!")
             self.model.stop_training = True
 
