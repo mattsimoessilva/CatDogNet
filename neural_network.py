@@ -94,3 +94,26 @@ class NeuralNetwork:
         # Predict the label of an unseen image
         A2 = self.forward_propagation(X)
         return np.argmax(A2, axis=1)
+    
+    def train_generator(self, generator):
+        for epoch in range(self.epochs):
+            epoch_cost = 0.
+            num_batches = 0
+            for X_batch, Y_batch in generator:
+                # Forward propagation
+                A2, cache = self.forward_propagation(X_batch)
+
+                # Compute cost
+                cost = self.compute_cost(A2, Y_batch)
+
+                # Backward propagation
+                grads = self.backward_propagation(X_batch, Y_batch, cache)
+
+                # Update parameters
+                self.update_parameters(grads)
+
+                epoch_cost += cost
+                num_batches += 1
+
+            # Print the cost every epoch
+            print ("Cost after epoch %i: %f" % (epoch, epoch_cost / num_batches))
