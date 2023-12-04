@@ -7,9 +7,10 @@ import os
 data_path = '/content/CatDogNet'  # Update with the actual path
 train_path = os.path.join(data_path, 'train')
 train_files = [os.path.join(train_path, file) for file in os.listdir(train_path) if file.endswith(('.jpg', '.png', '.jpeg'))]
+batch_size = 32
 
-train_generator = image_generator(train_files, batch_size=32)
-test_generator = image_generator(os.path.join(data_path, 'test'), batch_size=32)
+train_generator = image_generator(train_files, batch_size)
+test_generator = image_generator(os.path.join(data_path, 'test'), batch_size)
 
 # Get the shape of the data
 X_train_batch, Y_train_batch = next(train_generator)
