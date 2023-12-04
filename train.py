@@ -42,3 +42,4 @@ model.fit(datagen.flow(train_generator, batch_size=32),
 # Save the model
 model.save('model.h5')
 
+
