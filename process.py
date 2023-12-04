@@ -3,6 +3,7 @@ from os import listdir
 from shutil import copyfile
 from random import seed
 from random import random
+import os
 
 # create directories
 subdirs = ['train/train', 'test/test']
@@ -17,7 +18,7 @@ for subdir in subdirs:
 seed(1)
 # define ratio of pictures to use for validation
 val_ratio = 0.25
-# copy training dataset images into subdirectories
+# move training dataset images into subdirectories
 src_directory = 'train/train'
 for file in listdir(src_directory):
 	src = src_directory + '/' + file
@@ -27,7 +28,9 @@ for file in listdir(src_directory):
 	if file.startswith('cat'):
 		dst = dst_dir + 'cats/'  + file
 		copyfile(src, dst)
+		os.remove(src)  # remove the original file
 	elif file.startswith('dog'):
 		dst = dst_dir + 'dogs/'  + file
 		copyfile(src, dst)
+		os.remove(src)  # remove the original file
 
