@@ -12,9 +12,9 @@ datagen = ImageDataGenerator(featurewise_center=True)
 # specify imagenet mean values for centering
 datagen.mean = [123.68, 116.779, 103.939]
 # prepare iterator
-train_it = datagen.flow_from_directory('/content/CatDogNet/train',
+train_it = datagen.flow_from_directory('',
     class_mode='binary', batch_size=64, target_size=(224, 224))
-test_it = datagen.flow_from_directory('/content/CatDogNet/test',
+test_it = datagen.flow_from_directory('',
 	class_mode='binary', batch_size=64, target_size=(224, 224))
 # fit model
 history = model.fit_generator(train_it, steps_per_epoch=len(train_it),
