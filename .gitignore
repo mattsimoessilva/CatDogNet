@@ -2,6 +2,8 @@
 
 # Ignore the Python virtual environment directory
 env/
+/train/
+/test/
 
 # Ignore Python byte-compiled files
 __pycache__/
@@ -32,3 +34,4 @@ dist/
 .DS_Store
 ehthumbs.db
 Thumbs.db
+

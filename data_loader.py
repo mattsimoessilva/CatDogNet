@@ -9,8 +9,8 @@ def load_data(data_path):
     test_labels = []
 
     # Assuming that the 'train' and 'test' folders contain the images
-    train_path = os.path.join(data_path, 'train')
-    test_path = os.path.join(data_path, 'test')
+    train_path = os.path.join(data_path, 'train/train')
+    test_path = os.path.join(data_path, 'test/test')
 
     cat_images = []
     dog_images = []
