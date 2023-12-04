@@ -3,6 +3,7 @@ from sklearn.utils import class_weight
 from data_loader import image_generator, finite_image_generator, get_files
 from model import create_model
 import numpy as np
+from sklearn.utils import compute_class_weight
 
 # Get the file paths
 train_files = get_files('train')
@@ -11,9 +12,13 @@ test_files = get_files('test')
 # Create the finite image generator for computing class weights
 train_generator_finite = finite_image_generator(train_files, batch_size=32)
 
+# Assuming that your labels are either 0 or 1
+classes = np.array([0, 1])
+
 # Compute class weights
 y_train = np.array([pair[1] for pair in train_generator_finite])
-class_weights = class_weight.compute_class_weight('balanced', np.unique(y_train), y_train)
+y_train_flat = np.argmax(y_train, axis=1)
+class_weights = compute_class_weight('balanced', classes, y_train_flat)
 
 # Create the infinite image generators for training
 train_generator = image_generator(train_files, batch_size=32)
