@@ -27,8 +27,8 @@ def image_generator(files, batch_size=32):
         yield (batch_x, batch_y)
 
 # Assuming that the 'train' and 'test' folders contain the images
-train_path = 'train'
-test_path = 'test'
+train_path = 'train/train'
+test_path = 'test/test'
 
 train_files = [os.path.join(train_path, file) for file in os.listdir(train_path) if file.endswith(('.jpg', '.png', '.jpeg'))]
 test_files = [os.path.join(test_path, file) for file in os.listdir(test_path) if file.endswith(('.jpg', '.png', '.jpeg'))]

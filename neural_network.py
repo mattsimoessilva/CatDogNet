@@ -29,13 +29,14 @@ class NeuralNetwork:
     def forward_propagation(self, X):
         # Convert X to a NumPy array if it's a list
         X = np.array(X) if isinstance(X, list) else X
+        X_flat = X.reshape(X.shape[0], -1)
 
         # Ensure X has the correct shape (number of features)
         if X.ndim == 1:
             X = X.reshape(1, -1)
 
         # Forward propagation
-        self.Z1 = X.dot(self.W1) + self.b1
+        self.Z1 = X_flat.dot(self.W1) + self.b1
         self.A1 = self.relu(self.Z1)
         self.Z2 = self.A1.dot(self.W2) + self.b2
         self.A2 = self.softmax(self.Z2)
@@ -64,8 +65,9 @@ class NeuralNetwork:
         dW2 = (A1.T.dot(dZ2) + self.lambd * W2) / m
         db2 = np.sum(dZ2, axis=0, keepdims=True) / m
         dZ1 = dZ2.dot(W2.T) * self.relu_derivative(Z1)
-        dW1 = (X.T.dot(dZ1) + self.lambd * W1) / m
-        db1 = np.sum(dZ1, axis=0, keepdims=True) / m
+        dZ1_reshaped = dZ1.reshape(X.shape)
+        dW1 = (X.T.dot(dZ1_reshaped) + self.lambd * W1) / m
+        db1 = np.sum(dZ1_reshaped, axis=0, keepdims=True) / m
 
         # Update the weights and biases
         self.W1 -= self.alpha * dW1

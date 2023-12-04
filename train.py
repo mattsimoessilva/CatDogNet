@@ -1,36 +1,40 @@
-from neural_network import NeuralNetwork
-from image_generator import image_generator
-import pickle
-import os
-import os
+import tensorflow as tf
+from sklearn.utils import class_weight
+from data_loader import image_generator, get_files
+from model import create_model
+import numpy as np
 
-data_path = '/content/CatDogNet'  # Update with the actual path
-train_path = os.path.join(data_path, 'train')
-train_files = [os.path.join(train_path, file) for file in os.listdir(train_path) if file.endswith(('.jpg', '.png', '.jpeg'))]
-batch_size = 32
+# Get the file paths
+train_files = get_files('train/train')
+test_files = get_files('test/test')
 
-train_generator = image_generator(train_files, batch_size)
-test_generator = image_generator(os.path.join(data_path, 'test'), batch_size)
+# Create the image generators
+train_generator = image_generator(train_files, batch_size=32)
+test_generator = image_generator(test_files, batch_size=32)
 
-# Get the shape of the data
-X_train_batch, Y_train_batch = next(train_generator)
-n_x = X_train_batch.shape[1]
-n_y = Y_train_batch.shape[1]
+# Compute class weights
+y_train = np.array([pair[1] for pair in train_generator])
+class_weights = class_weight.compute_class_weight('balanced', np.unique(y_train), y_train)
 
-# Create and train the neural network
-n_h = 64  # Number of neurons in the hidden layer
-neural_net = NeuralNetwork(n_x, n_h, n_y, alpha=0.01, batch_size=batch_size, epochs=100, lambd=0.7)
+# Create an ImageDataGenerator object for data augmentation
+datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+    rotation_range=20,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=True)
 
-# Train the network using the generator
-neural_net.train_generator(train_generator)
+# Create the model
+model = create_model()
 
-# Save the trained parameters
-params = {
-    'W1': neural_net.W1,
-    'b1': neural_net.b1,
-    'W2': neural_net.W2,
-    'b2': neural_net.b2
-}
+# Train the model
+steps_per_epoch = len(train_files) / 32
+validation_steps = len(test_files) / 32
+model.fit(datagen.flow(train_generator, batch_size=32),
+          steps_per_epoch=steps_per_epoch,
+          epochs=100,
+          class_weight=class_weights,
+          validation_data=test_generator,
+          validation_steps=validation_steps)
 
-with open('model_params.pkl', 'wb') as f:
-    pickle.dump(params, f)
+# Save the model
+model.save('model.h5')

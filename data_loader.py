@@ -1,58 +1,33 @@
-from image_processing import load_and_preprocess_images, create_labels, split_data
 import os
 import cv2
+import numpy as np
 
-def load_data(data_path):
-    train_data = []
-    train_labels = []
-    test_data = []
-    test_labels = []
+def load_data(files):
+    data = []
+    labels = []
+    for file in files:
+        # Read the image
+        img = cv2.imread(file)
+        # Resize the image
+        img = cv2.resize(img, (64, 64))
+        # Normalize the image
+        img = img / 255.0
+        # Append the image to the data list
+        data.append(img)
+        # Append the label to the labels list
+        label = [1, 0] if 'cat' in file else [0, 1]
+        labels.append(label)
+    # Convert the lists to numpy arrays
+    data = np.array(data)
+    labels = np.array(labels)
+    return data, labels
 
-    # Assuming that the 'train' and 'test' folders contain the images
-    train_path = os.path.join(data_path, 'train')
-    test_path = os.path.join(data_path, 'test')
+def get_files(path):
+    return [os.path.join(path, file) for file in os.listdir(path) if file.endswith(('.jpg', '.png', '.jpeg'))]
 
-    cat_images = []
-    dog_images = []
-
-    # Load training data
-    for file_name in sorted(os.listdir(train_path)):
-        file_path = os.path.join(train_path, file_name)
-
-        # Skip non-image files
-        if not file_path.endswith(('.jpg', '.png', '.jpeg')):
-            continue
-
-        # Load and preprocess training images
-        image = cv2.imread(file_path)
-        image = image.reshape(-1) # Flatten the image
-
-        if 'cat' in file_name:
-            cat_images.append((image, 1))  # 1 for cat
-        elif 'dog' in file_name:
-            dog_images.append((image, 0))  # 0 for dog
-
-    # Load only half of the cats and dogs
-    half_cat = len(cat_images) // 2
-    half_dog = len(dog_images) // 2
-
-    train_data += [img for img, label in cat_images[:half_cat]]
-    train_labels += [label for img, label in cat_images[:half_cat]]
-
-    train_data += [img for img, label in dog_images[:half_dog]]
-    train_labels += [label for img, label in dog_images[:half_dog]]
-
-    # Load and preprocess test images
-    for file_name in sorted(os.listdir(test_path)):
-        file_path = os.path.join(test_path, file_name)
-
-        # Skip non-image files
-        if not file_path.endswith(('.jpg', '.png', '.jpeg')):
-            continue
-
-        # Load and preprocess test images
-        image = cv2.imread(file_path)
-        image = image.reshape(-1) # Flatten the image
-        test_data.append(image)
-
-    return train_data, train_labels, test_data, test_labels
+def image_generator(files, batch_size=32):
+    while True:
+        # Select files (paths/indices) for the batch
+        batch_paths = np.random.choice(a=files, size=batch_size)
+        batch_input, batch_output = load_data(batch_paths)
+        yield (batch_input, batch_output)
