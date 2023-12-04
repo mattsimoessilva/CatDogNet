@@ -1,23 +1,27 @@
 from neural_network import NeuralNetwork
-from data_loader import load_data
+from image_generator import image_generator
 import pickle
+import os
 
 # Load training data
 data_path = '/content/CatDogNet'  # Update with the actual path
-X_train, Y_train, X_test, Y_test = load_data(data_path)
+batch_size = 32  # Update with the desired batch size
+
+# Create image generators for training and testing data
+train_generator = image_generator(os.path.join(data_path, 'train'), batch_size)
+test_generator = image_generator(os.path.join(data_path, 'test'), batch_size)
+
+# Get the shape of the data
+X_train_batch, Y_train_batch = next(train_generator)
+n_x = X_train_batch.shape[1]
+n_y = Y_train_batch.shape[1]
 
 # Create and train the neural network
-n_x = len(X_train[0])
 n_h = 64  # Number of neurons in the hidden layer
-n_y = len(set(Y_train))  # Number of classes (assuming classification)
+neural_net = NeuralNetwork(n_x, n_h, n_y, alpha=0.01, batch_size=batch_size, epochs=100, lambd=0.7)
 
-# Checking values
-print(f"n_x = {n_x}")
-print(f"n_h = {n_h}")
-print(f"n_y = {n_y}")
-      
-neural_net = NeuralNetwork(n_x, n_h, n_y, alpha=0.01, batch_size=32, epochs=100, lambd=0.7)
-neural_net.train(X_train, Y_train)
+# Train the network using the generator
+neural_net.train_generator(train_generator)
 
 # Save the trained parameters
 params = {
