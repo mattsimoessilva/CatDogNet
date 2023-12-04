@@ -4,6 +4,13 @@ from model import define_model
 import numpy as np
 import sklearn as sk
 from keras.preprocessing.image import ImageDataGenerator
+from keras.callbacks import Callback
+
+class MyCallback(Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        if(logs.get('accuracy') > 0.9):
+            print("\nReached 90% accuracy so cancelling training!")
+            self.model.stop_training = True
 
 # define model
 model = define_model()
@@ -17,8 +24,9 @@ train_it = datagen.flow_from_directory('/content/CatDogNet/train',
 test_it = datagen.flow_from_directory('/content/CatDogNet/test',
 	class_mode='binary', batch_size=64, target_size=(224, 224))
 # fit model
+callbacks = MyCallback()
 history = model.fit_generator(train_it, steps_per_epoch=len(train_it),
-	validation_data=test_it, validation_steps=len(test_it), epochs=10, verbose=1)
+	validation_data=test_it, validation_steps=len(test_it), epochs=10, verbose=1, callbacks=[callbacks])
 # evaluate model
 _, acc = model.evaluate_generator(test_it, steps=len(test_it), verbose=0)
 print('> %.3f' % (acc * 100.0))
