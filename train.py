@@ -5,8 +5,8 @@ from model import create_model
 import numpy as np
 
 # Get the file paths
-train_files = get_files('train/train')
-test_files = get_files('test/test')
+train_files = get_files('train')
+test_files = get_files('test')
 
 # Create the image generators
 train_generator = image_generator(train_files, batch_size=32)
