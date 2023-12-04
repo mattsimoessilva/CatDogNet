@@ -1,50 +1,26 @@
 import tensorflow as tf
-from sklearn.utils import class_weight
 from data_loader import image_generator, finite_image_generator, get_files
-from model import create_model
+from model import define_model
 import numpy as np
-from sklearn.utils.class_weight import compute_class_weight
+import sklearn as sk
+from keras.preprocessing.image import ImageDataGenerator
 
-# Get the file paths
-train_files = get_files('train')
-test_files = get_files('test')
+# define model
+model = define_model()
+# create data generator
+datagen = ImageDataGenerator(featurewise_center=True)
+# specify imagenet mean values for centering
+datagen.mean = [123.68, 116.779, 103.939]
+# prepare iterator
+train_it = datagen.flow_from_directory('train',
+    class_mode='binary', batch_size=64, target_size=(224, 224))
+test_it = datagen.flow_from_directory('test',
+	class_mode='binary', batch_size=64, target_size=(224, 224))
+# fit model
+history = model.fit_generator(train_it, steps_per_epoch=len(train_it),
+	validation_data=test_it, validation_steps=len(test_it), epochs=10, verbose=1)
+# evaluate model
+_, acc = model.evaluate_generator(test_it, steps=len(test_it), verbose=0)
+print('> %.3f' % (acc * 100.0))
 
-# Create the finite image generator for computing class weights
-train_generator_finite = finite_image_generator(train_files, batch_size=32)
-
-# Assuming that your labels are either 0 or 1
-classes = np.array([0, 1])
-
-# Compute class weights
-y_train = np.array([pair[1] for pair in train_generator_finite])
-y_train_flat = np.argmax(y_train, axis=1)
-class_weights = compute_class_weight('balanced', classes, y_train_flat)
-
-# Create the infinite image generators for training
-train_generator = image_generator(train_files, batch_size=32)
-test_generator = image_generator(test_files, batch_size=32)
-
-# Create an ImageDataGenerator object for data augmentation
-datagen = tf.keras.preprocessing.image.ImageDataGenerator(
-    rotation_range=20,
-    width_shift_range=0.2,
-    height_shift_range=0.2,
-    horizontal_flip=True)
-
-# Create the model
-model = create_model()
-
-# Train the model
-steps_per_epoch = len(train_files) / 32
-validation_steps = len(test_files) / 32
-model.fit(datagen.flow(train_generator, batch_size=32),
-          steps_per_epoch=steps_per_epoch,
-          epochs=100,
-          class_weight=class_weights,
-          validation_data=test_generator,
-          validation_steps=validation_steps)
-
-# Save the model
 model.save('model.h5')
-
-

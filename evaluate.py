@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 
 # Load the image
-img = tf.keras.preprocessing.image.load_img('teste4.jpg', target_size=(64, 64))
+img = tf.keras.preprocessing.image.load_img('teste3.jpeg', target_size=(64, 64))
 img = tf.keras.preprocessing.image.img_to_array(img)
 img = np.expand_dims(img, axis=0)
 

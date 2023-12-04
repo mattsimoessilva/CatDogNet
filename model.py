@@ -1,36 +1,27 @@
-import numpy as np
-import tensorflow as tf
+# vgg16 model used for transfer learning on the dogs and cats dataset
+import sys
+from matplotlib import pyplot
+from keras.utils import to_categorical
+from keras.applications.vgg16 import VGG16
+from keras.models import Model
+from keras.layers import Dense
+from keras.layers import Flatten
+from keras.optimizers import SGD
 
-def create_model():
-    model = tf.keras.Sequential()
-
-    # Add several convolutional layers with increasing number of filters
-    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3), kernel_regularizer=tf.keras.regularizers.l2(0.01)))
-    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01)))
-    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(tf.keras.layers.Conv2D(128, (3, 3), activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01)))
-    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(tf.keras.layers.Conv2D(256, (3, 3), activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01)))
-    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-
-    # Flatten the tensor output from the previous layer
-    model.add(tf.keras.layers.Flatten())
-
-    # Add several dense (fully connected) layers with dropout
-    model.add(tf.keras.layers.Dense(256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01)))
-    model.add(tf.keras.layers.Dropout(0.5))
-
-    model.add(tf.keras.layers.Dense(128, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01)))
-    model.add(tf.keras.layers.Dropout(0.5))
-
-    # Add the output layer
-    model.add(tf.keras.layers.Dense(2, activation='softmax'))
-
-    # Compile the model
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-    return model
+# define cnn model
+def define_model():
+	# load model
+	model = VGG16(include_top=False, input_shape=(224, 224, 3))
+	# mark loaded layers as not trainable
+	for layer in model.layers:
+		layer.trainable = False
+	# add new classifier layers
+	flat1 = Flatten()(model.layers[-1].output)
+	class1 = Dense(128, activation='relu', kernel_initializer='he_uniform')(flat1)
+	output = Dense(1, activation='sigmoid')(class1)
+	# define new model
+	model = Model(inputs=model.inputs, outputs=output)
+	# compile model
+	opt = SGD(lr=0.001, momentum=0.9)
+	model.compile(optimizer=opt, loss='binary_crossentropy', metrics=['accuracy'])
+	return model
