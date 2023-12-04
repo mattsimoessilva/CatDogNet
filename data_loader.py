@@ -33,8 +33,8 @@ def load_data(data_path):
             dog_images.append((image, 0))  # 0 for dog
 
     # Load only half of the cats and dogs
-    half_cat = len(cat_images) // 2
-    half_dog = len(dog_images) // 2
+    half_cat = len(cat_images) // 10
+    half_dog = len(dog_images) // 10
 
     train_data += [img for img, label in cat_images[:half_cat]]
     train_labels += [label for img, label in cat_images[:half_cat]]
