@@ -3,7 +3,7 @@ from sklearn.utils import class_weight
 from data_loader import image_generator, finite_image_generator, get_files
 from model import create_model
 import numpy as np
-from sklearn.utils import compute_class_weight
+from sklearn.utils.class_weight import compute_class_weight
 
 # Get the file paths
 train_files = get_files('train')
