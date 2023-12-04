@@ -26,12 +26,30 @@ def image_generator(files, batch_size=32):
 
         yield (batch_x, batch_y)
 
-# Assuming that the 'train' and 'test' folders contain the images
-train_path = 'train/train'
-test_path = 'test/test'
+def finite_image_generator(files, batch_size=32):
+    num_files = len(files)
+    num_batches = num_files // batch_size
 
-train_files = [os.path.join(train_path, file) for file in os.listdir(train_path) if file.endswith(('.jpg', '.png', '.jpeg'))]
-test_files = [os.path.join(test_path, file) for file in os.listdir(test_path) if file.endswith(('.jpg', '.png', '.jpeg'))]
+    for i in range(num_batches):
+        # Select files (paths/indices) for the batch
+        batch_paths = files[i*batch_size : (i+1)*batch_size]
+        batch_input = []
+        batch_output = []
 
-train_generator = image_generator(train_files, batch_size=32)
-test_generator = image_generator(test_files, batch_size=32)
+        # Read in each input, perform preprocessing and get labels
+        for input_path in batch_paths:
+            input = cv2.imread(input_path)
+            output = [1, 0] if 'cat' in input_path else [0, 1]
+
+            input = cv2.resize(input, (64, 64))
+            input = input.flatten()
+
+            batch_input.append(input)
+            batch_output.append(output)
+
+        # Return a tuple of (input, output) to feed the network
+        batch_x = np.array(batch_input)
+        batch_y = np.array(batch_output)
+
+        yield (batch_x, batch_y)
+
